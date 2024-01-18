@@ -57,39 +57,39 @@ if selected_page == 'Réponse aux questions':
 
     st.header('Réponse aux questions', divider='blue')
 
-    df = pd.read_excel('Traduction avis clients/avis_1_traduit.xlsx')
-
-    df.drop(columns=['type', 'avis_en', 'avis_cor', 'avis_cor_en'], inplace=True)
-    df['avis'] = df['avis'].replace('\n', ' ', regex=True)
-    df.dropna(inplace=True)
-    df['note'] = df['note'].astype(int)
-
-    word2vec_model = KeyedVectors.load_word2vec_format(hf_hub_download(repo_id="Word2vec/wikipedia2vec_frwiki_20180420_300d", filename="frwiki_20180420_300d.txt"))
-    def vectorize_sentence(sentence):
-        words = sentence.split()  # Supposons que vos avis soient tokenisés par des espaces
-        vectors = [word2vec_model[word] for word in words if word in word2vec_model.key_to_index]
-        if vectors:
-            return sum(vectors) / len(vectors)
-        else:
-            return None
-    df['avis_vectorisé'] = df['avis'].apply(vectorize_sentence)
-
-    def cosine_similarity(embedding1, embedding2):
-        return np.dot(embedding1, embedding2) / (np.linalg.norm(embedding1) * np.linalg.norm(embedding2))
-
-    def find_answer(question):
-        vectorized_question = vectorize_sentence(question)
-        similarities = []
-        for index, row in df.iterrows():
-            similarities.append(cosine_similarity(vectorized_question, row['avis_vectorisé']))
-        max_similarity_index = similarities.index(max(similarities))
-        return df.iloc[max_similarity_index]
+    df = pd.read_csv('avis.csv')
+    df['avis_vectorisé'] = df['avis_vectorisé'].apply(lambda x: np.array([float(item) for item in x.split(', ')]))
 
     user_question = st.text_input('Entrez votre texte ici :')
     if st.button('Soumettre'):
         if user_question:
+
+            word2vec_model = KeyedVectors.load_word2vec_format(hf_hub_download(repo_id="Word2vec/wikipedia2vec_frwiki_20180420_300d", filename="frwiki_20180420_300d.txt"))
+            def vectorize_sentence(sentence):
+                words = sentence.split()  # Supposons que vos avis soient tokenisés par des espaces
+                vectors = [word2vec_model[word] for word in words if word in word2vec_model.key_to_index]
+                if vectors:
+                    return sum(vectors) / len(vectors)
+                else:
+                    return None
+
+            def cosine_similarity(embedding1, embedding2):
+                return np.dot(embedding1, embedding2) / (np.linalg.norm(embedding1) * np.linalg.norm(embedding2))
+
+            def find_answer(question):
+                vectorized_question = vectorize_sentence(question)
+                similarities = []
+                for index, row in df.iterrows():
+                    similarities.append(cosine_similarity(vectorized_question, row['avis_vectorisé']))
+                max_similarity_index = similarities.index(max(similarities))
+                return df.iloc[max_similarity_index]
+
             answer = find_answer(user_question)
             st.subheader('Réponse trouvée :')
-            st.write(answer)
+            st.write('Note :', answer['note'])
+            st.write('Avis :', answer['avis'])
+            st.write('Assureur :', answer['assureur'])
+            st.write('Produit :', answer['produit'])
+            st.write('Date de publication :', answer['date_publication'])
         else:
             st.warning("Veuillez saisir du texte.")
