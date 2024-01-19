@@ -60,7 +60,7 @@ if selected_page == 'Réponse aux questions':
     df = pd.read_csv('avis.csv')
     df['avis_vectorisé'] = df['avis_vectorisé'].apply(lambda x: np.array([float(item) for item in x.split(', ')]))
 
-    user_question = st.text_input('Entrez votre texte ici :', height=200)
+    user_question = st.text_area('Entrez votre texte ici :', height=200)
     if st.button('Soumettre'):
         if user_question:
 
