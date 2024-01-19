@@ -27,7 +27,7 @@ if selected_page == 'Résumé du texte':
 
     st.header('Résumé du texte', divider='blue')
 
-    user_input = st.text_area("Entrez votre texte ici :")
+    user_input = st.text_area("Entrez votre texte ici :", height=200)
 
     if st.button("Résumer"):
         if user_input:
@@ -42,7 +42,7 @@ if selected_page == 'Prédiction des étoiles':
 
     st.header('Prédiction des étoiles', divider='blue')
 
-    user_input = st.text_area("Entrez votre texte ici :")
+    user_input = st.text_area("Entrez votre texte ici :", height=200)
 
     if st.button("Prédire"):
         if user_input:
@@ -60,7 +60,7 @@ if selected_page == 'Réponse aux questions':
     df = pd.read_csv('avis.csv')
     df['avis_vectorisé'] = df['avis_vectorisé'].apply(lambda x: np.array([float(item) for item in x.split(', ')]))
 
-    user_question = st.text_input('Entrez votre texte ici :')
+    user_question = st.text_input('Entrez votre texte ici :', height=200)
     if st.button('Soumettre'):
         if user_question:
 
