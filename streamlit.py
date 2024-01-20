@@ -22,7 +22,7 @@ st.markdown(
 st.title('Projet 2 NLP par Lucas Artaud et Iswarya Sivasubramaniam')
 
 st.sidebar.header('Pages')
-selected_page = st.sidebar.selectbox('Sélection de page', ['Résumé du texte', 'Prédiction des étoiles', 'Réponse aux questions'])
+selected_page = st.sidebar.selectbox('Sélection de page', ['Résumé du texte', 'Prédiction des étoiles', "Recherche d'informations"])
 if selected_page == 'Résumé du texte':
 
     st.header('Résumé du texte', divider='blue')
@@ -53,9 +53,9 @@ if selected_page == 'Prédiction des étoiles':
         else:
             st.warning("Veuillez saisir du texte.")
 
-if selected_page == 'Réponse aux questions':
+if selected_page == "Recherche d'informations":
 
-    st.header('Réponse aux questions', divider='blue')
+    st.header("Recherche d'informations", divider='blue')
 
     df = pd.read_csv('avis.csv')
     df['avis_vectorisé'] = df['avis_vectorisé'].apply(lambda x: np.array([float(item) for item in x.split(', ')]))
@@ -85,7 +85,7 @@ if selected_page == 'Réponse aux questions':
                 return df.iloc[max_similarity_index]
 
             answer = find_answer(user_question)
-            st.subheader('Réponse trouvée :')
+            st.subheader('Avis trouvé :')
             st.write('Note :', answer['note'])
             st.write('Avis :', answer['avis'])
             st.write('Assureur :', answer['assureur'])
